@@ -20,3 +20,5 @@ Juego arcade desarrollado en Python utilizando la biblioteca Pygame. El objetivo
 3. Ejecuta el juego indicando el nivel a cargar:
    ```bash
    python arkanoid_game.py niveles/demo.txt
+   python arkanoid_game.py niveles/nivel1
+   python arkanoid_game.py niveles/nivel2
