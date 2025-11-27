@@ -8,7 +8,7 @@ Juego arcade desarrollado en Python utilizando la biblioteca Pygame. El objetivo
 * Yeray  Soler Sánchez LKK2979
 * Ilia Nazari RVP5635
 * Agustín González moreno WCJ8528
-* Eduardo 
+* Eduardo Rondan García FKM2787
 
 ## Requisitos
 * Python 3.10 o superior
