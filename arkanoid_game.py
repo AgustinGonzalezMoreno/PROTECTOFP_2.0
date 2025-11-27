@@ -202,18 +202,85 @@ def actualizar_bola(self) -> None:
 @arkanoid_method
 def dibujar_escena(self) -> None:
     """Renderiza fondo, bloques, paleta, bola y HUD."""
-    # - Rellena el fondo y dibuja cada bloque con `self.dibujar_rectangulo`.
-    # - Pinta la paleta y la bola con las utilidades proporcionadas.
-    # - Muestra puntuación, vidas y mensajes usando `self.dibujar_texto`.
-    raise NotImplementedError
+    
+    # 0. Seguridad: Si no hay pantalla inicializada, no hacemos nada
+    if not self.screen:
+        return
+
+    # 1. FONDO
+    # Limpiamos el frame anterior pintando todo del color de fondo
+    self.screen.fill(self.BACKGROUND_COLOR)
+
+    # 2. BLOQUES
+    # Usamos zip() para recorrer la lista de rectángulos y la de colores a la vez
+    for bloque, color in zip(self.blocks, self.block_colors):
+        self.dibujar_rectangulo(bloque, color)
+
+    # 3. PALETA
+    self.dibujar_rectangulo(self.paddle, self.PADDLE_COLOR)
+
+    # 4. BOLA
+    # Convertimos la posición (Vector2) a una tupla de enteros (int, int) para dibujar
+    centro_bola = (int(self.ball_pos.x), int(self.ball_pos.y))
+    self.dibujar_circulo(centro_bola, self.BALL_RADIUS, self.BALL_COLOR)
+
+    # 5. HUD (Marcadores)
+    # Dibujamos texto en la parte superior
+    self.dibujar_texto(f"Puntuación: {self.score}", (20, 20))
+    self.dibujar_texto(f"Vidas: {self.lives}", (self.SCREEN_WIDTH - 120, 20))
+
+    # 6. MENSAJE FINAL (Victoria/Derrota)
+    if self.end_message:
+        # Si hay mensaje, lo mostramos en grande en el centro (aprox)
+        self.dibujar_texto(self.end_message, (self.SCREEN_WIDTH // 2 - 80, self.SCREEN_HEIGHT // 2), grande=True)
 
 @arkanoid_method
 def run(self) -> None:
     """Ejecuta el bucle principal del juego."""
-    # - Inicializa recursos (`self.inicializar_pygame`, `self.cargar_nivel`, etc.).
-    # - Procesa eventos de `self.iterar_eventos()` y llama a los métodos de actualización/dibujo.
-    # - Refresca la pantalla con `self.actualizar_pantalla()` y cierra con `self.finalizar_pygame()`.
-    raise NotImplementedError
+    
+    # 1. INICIALIZACIÓN
+    # Arrancamos la ventana de Pygame y el reloj
+    self.inicializar_pygame()
+    
+    # Preparamos el nivel y los objetos llamando a los métodos que hicimos antes
+    self.cargar_nivel()
+    self.preparar_entidades()
+    self.crear_bloques()
+
+    # Variable de control del bucle
+    self.running = True
+
+    # 2. BUCLE PRINCIPAL (Game Loop)
+    while self.running:
+        
+        # A) Procesar Eventos (Input del sistema)
+        for event in self.iterar_eventos():
+            # Si cierran la ventana (X)
+            if event.type == self.EVENT_QUIT:
+                self.running = False
+            # (Opcional) Si pulsan ESC, también salimos
+            elif event.type == self.EVENT_KEYDOWN:
+                if event.key == self.KEY_ESCAPE:
+                    self.running = False
+
+        # B) Actualizar Lógica (Solo si el juego sigue en marcha)
+        self.procesar_input()
+        self.actualizar_bola()
+
+        # C) Dibujar
+        self.dibujar_escena()
+        
+        # D) Refrescar Pantalla (Hacer visibles los cambios)
+        self.actualizar_pantalla()
+
+        # E) Control de Tiempo (Mantener 60 FPS estables)
+        # self.clock se inicializó en inicializar_pygame()
+        if self.clock:
+            self.clock.tick(self.FPS)
+
+    # 3. CIERRE
+    # Al salir del while, cerramos Pygame correctamente
+    self.finalizar_pygame()
 
 
 def main() -> None:

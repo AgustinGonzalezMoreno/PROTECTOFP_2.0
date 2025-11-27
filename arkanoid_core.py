@@ -134,8 +134,8 @@ class ArkanoidGame:
             return
 
         # Permite ejecutar en entornos sin servidor gráfico (tests/CI).
-        if "SDL_VIDEODRIVER" not in os.environ and not os.environ.get("DISPLAY"):
-            os.environ["SDL_VIDEODRIVER"] = "dummy"
+        #if "SDL_VIDEODRIVER" not in os.environ and not os.environ.get("DISPLAY"):
+            #os.environ["SDL_VIDEODRIVER"] = "dummy"
 
         pygame.init()
         pygame.display.set_caption("Arkanoid M2")
