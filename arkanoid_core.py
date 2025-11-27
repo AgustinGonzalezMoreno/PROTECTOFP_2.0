@@ -31,9 +31,10 @@ class ArkanoidGame:
     SCREEN_HEIGHT: int = 600
     FPS: int = 60
 
-    BACKGROUND_COLOR = (12, 20, 32)
-    PADDLE_COLOR = (230, 230, 240)
-    BALL_COLOR = (255, 245, 235)
+    # Configuración visual (Estilo Neon)
+    BACKGROUND_COLOR = (20, 20, 40)      # Azul noche
+    PADDLE_COLOR = (0, 255, 255)         # Cyan brillante
+    BALL_COLOR = (255, 0, 128)           # Rosa fuerte
 
     # Paleta
     PADDLE_SIZE = (120, 18)
