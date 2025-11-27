@@ -126,76 +126,65 @@ def procesar_input(self) -> None:
 def actualizar_bola(self) -> None:
     """Actualiza la posición de la bola y resuelve colisiones."""
     
-    # Si el juego ha terminado (ganado o perdido), no movemos nada
     if self.end_message:
         return
 
     # 1. MOVER LA BOLA
-    # Sumamos la velocidad actual a la posición
     self.ball_pos += self.ball_velocity
-    
-    # Obtenemos el rectángulo actualizado para comprobar choques
     ball_rect = self.obtener_rect_bola()
 
     # 2. REBOTES CON PAREDES
-    # Paredes Izquierda y Derecha: Invertimos velocidad X
     if ball_rect.left < 0 or ball_rect.right > self.SCREEN_WIDTH:
         self.ball_velocity.x *= -1
-        # Ajuste de seguridad para que no se quede pegada a la pared
         if ball_rect.left < 0: self.ball_pos.x = self.BALL_RADIUS
         if ball_rect.right > self.SCREEN_WIDTH: self.ball_pos.x = self.SCREEN_WIDTH - self.BALL_RADIUS
 
-    # Techo: Invertimos velocidad Y
     if ball_rect.top < 0:
         self.ball_velocity.y *= -1
-        self.ball_pos.y = self.BALL_RADIUS # Ajuste de seguridad
+        self.ball_pos.y = self.BALL_RADIUS
 
     # 3. GESTIÓN DE VIDAS (El suelo)
     if ball_rect.top > self.SCREEN_HEIGHT:
         self.lives -= 1
         if self.lives > 0:
-            # Si quedan vidas, recolocamos la bola en la paleta
             self.reiniciar_bola()
         else:
-            # Si no, Game Over
             self.end_message = "GAME OVER"
-        return # Salimos del método para no procesar más colisiones en este frame
+        return
 
-    # 4. COLISIÓN CON PALETA
-    # Usamos colliderect para ver si se tocan
+    # 4. COLISIÓN CON PALETA (MEJORADA - CON EFECTO)
     if ball_rect.colliderect(self.paddle):
-        # Solo rebotamos si la bola está bajando (para evitar rebotes raros si entra de lado)
+        # Solo rebotamos si la bola está bajando
         if self.ball_velocity.y > 0:
-            self.ball_velocity.y *= -1
+            # Calculamos dónde golpeó relativo al centro (-1 a 1)
+            diferencia_x = ball_rect.centerx - self.paddle.centerx
+            ancho_mitad = self.paddle.width / 2
+            factor = diferencia_x / ancho_mitad
             
-            # (Opcional) Damos un empujoncito extra en Y para asegurar que sube
-            self.ball_pos.y = self.paddle.top - self.BALL_RADIUS - 1
+            # Nueva velocidad: X depende del golpe, Y siempre hacia arriba
+            nueva_velocidad = Vector2(factor * self.BALL_SPEED, -self.BALL_SPEED)
+            
+            # Normalizamos para mantener la velocidad constante
+            self.ball_velocity = nueva_velocidad.normalize() * self.BALL_SPEED
 
     # 5. COLISIÓN CON BLOQUES
-    # Buscamos si chocamos con algún bloque.
-    # Recorremos la lista al revés o usamos un índice para poder borrar sin romper el bucle.
     indice_colision = -1
     for i, bloque in enumerate(self.blocks):
         if ball_rect.colliderect(bloque):
             indice_colision = i
-            break # Solo procesamos un bloque por frame para simplificar
+            break
     
     if indice_colision != -1:
-        # ¡Impacto!
-        # 1. Rebotar: Invertimos Y (asumimos choque vertical por simplicidad)
         self.ball_velocity.y *= -1
-        
-        # 2. Sumar Puntos: Buscamos el símbolo y sus puntos en el diccionario
         simbolo = self.block_symbols[indice_colision]
         puntos = self.BLOCK_POINTS.get(simbolo, 10)
         self.score += puntos
         
-        # 3. Eliminar bloque: Borramos de las 3 listas paralelas
         self.blocks.pop(indice_colision)
         self.block_colors.pop(indice_colision)
         self.block_symbols.pop(indice_colision)
 
-    # 6. CONDICIÓN DE VICTORIA
+    # 6. VICTORIA
     if not self.blocks:
         self.end_message = "VICTORY!"
 
