@@ -3,7 +3,12 @@
 Juego arcade desarrollado en Python utilizando la biblioteca Pygame. El objetivo es destruir todos los bloques de la pantalla sin dejar caer la bola.
 
 ## Autores
-* 
+* Arturo Borreguero Rodríguez VTH4914
+* Hilario Hernández Jiménez STG0609
+* Yeray  Soler Sánchez LKK2979
+* Ilia Nazari RVP5635
+* Agustín González moreno WCJ8528
+* Eduardo 
 
 ## Requisitos
 * Python 3.10 o superior
